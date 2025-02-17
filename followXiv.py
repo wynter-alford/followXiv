@@ -33,19 +33,22 @@ class Entry:
         self.authors = authors
         self.abstract = abstract[0]
         self.link = link
+        self.matched = ""
     
     def __str__(self):
-        return f"Title: {self.title}\nAuthors: {self.authors}\nAbstract: {self.abstract}\nLink: {self.link}"
+        return f"[Matched {self.matched}]\nTitle: {self.title}\nAuthors: {self.authors}\nAbstract: {self.abstract}\nLink: {self.link}"
     
     def word_search(self, term_list):
         for term in term_list:
             if term.lower() in self.title.lower() or term.lower() in self.abstract.lower():
+                self.matched = term
                 return True
         return False
             
     def author_search(self, author_list):
         for author in author_list:
             if author in self.authors:
+                self.matched = author
                 return True
         return False
 
