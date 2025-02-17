@@ -15,7 +15,9 @@ All steps are then performed by the followXiv.py script. Papers found by the fil
 ## Potential features to add:
 
 - **Fuzzy author matching**: Currently, authors will only match if they appear exactly as entered in the json file. So "Wynter R Alford" will not match "Wynter Alford" or "Wynter R. Alford".
+- **"And" conditions:** Allow conditions like "Author 1 AND Author 2" or "Keyword 1 AND Keyword 2 AND Keyword 3" for the filter
 - **Some kind of UI** that isn't just the python script and a json file.
+- **Monitor for citations?**: Longer term, not sure how feasible this one is, but it would be nice to be able to flag papers that cite particular references.
 - **Integration with Zotero?**: Longer term, I'd love to look into how Zotero plugins work and see if there's a way to add matching papers directly into a folder in Zotero.
 
 Issues & PRs welcome.
