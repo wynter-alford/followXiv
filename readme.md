@@ -12,7 +12,7 @@ User preferences are specified in the ``configuration.json`` file, which allows 
 
 All steps are then performed by the followXiv.py script. Papers found by the filter are saved to ``output.txt`` with their title, authors, abstract, and url.
 
-A way to make this run every weekday morning on Linux/Unix systems is to run ``crontab -e`` and then paste ``0 9 * * 1-5 cd [installation path]/followXiv && git stash && git pull && python3 followXiv.py && mv output.txt "$(date -I).txt"``. There are probably other clever options that I haven't thought of.
+A way to make this run every weekday morning on Linux/Unix systems is to run ``crontab -e`` and then paste ``0 9 * * 1-5 cd [installation path]/followXiv && python3 followXiv.py && mv output.txt "$(date -I).txt"``. There are probably other clever options that I haven't thought of. Also note that this won't auto-update.
 
 ## Potential features to add:
 
