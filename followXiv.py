@@ -38,17 +38,14 @@ class Entry:
     def __str__(self):
         return f"[Matched {self.matched}]\nTitle: {self.title}\nAuthors: {self.authors}\nAbstract: {self.abstract}\nLink: {self.link}"
     
-    def word_search(self, term_list):
+    def search(self, author_list, term_list):
+        for author in author_list:
+                    if author in self.authors:
+                        self.matched = author
+                        return True
         for term in term_list:
             if term.lower() in self.title.lower() or term.lower() in self.abstract.lower():
                 self.matched = term
-                return True
-        return False
-            
-    def author_search(self, author_list):
-        for author in author_list:
-            if author in self.authors:
-                self.matched = author
                 return True
         return False
 
@@ -83,7 +80,7 @@ for feed_name in my_feeds:
 output_file = open("output.txt", "w")
 
 for entry in entries_list:
-    if entry.word_search(my_keywords) or entry.author_search(my_authors):
+    if entry.search(my_authors, my_keywords):
         output_file.write(str(entry) + "\n\n")
 
 output_file.close()
