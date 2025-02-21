@@ -4,7 +4,7 @@ FollowXiv is a simple Python script for monitoring arXiv for new papers by speci
 
 ## Usage:
 
-User preferences are specified in the ``configuration.json`` file, which allows inputs of the following types:
+Before first usage, create a file ``configuration.json`` to contain your preferences. Sample formatting is provided in the ``sample_configuration.json`` file. The followXiv script currently allows inputs of the following types:
 
 - Feeds: which pages on arXiv to pull content from (currently just .../new)
 - Authors: papers by any listed author will be selected by the filter 
