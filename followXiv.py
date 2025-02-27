@@ -1,10 +1,9 @@
-#! .venv/bin/python3
-
 from bs4 import BeautifulSoup
 import re
 import json
 import requests
 import shutil
+from datetime import datetime
 
 # Functions for processing html file
 def get_authors(article):
@@ -37,11 +36,13 @@ class Entry:
         self.abstract = abstract[0]
         self.link = link
         self.matched = ""
-    
+        self.isNew = datetime.now().strftime("%Y%m")[2:] == self.link[-10:-6]
+
     def __str__(self):
         return f"[Matched {self.matched}]\nTitle: {self.title}\nAuthors: {self.authors}\nAbstract: {self.abstract}\nLink: {self.link}"
-    
+
     def search(self, author_list, term_list):
+        if (not self.isNew) and (not preferences["MatchResubmissions"]): return False
         for author in author_list:
                     if author in self.authors:
                         self.matched = author
@@ -63,18 +64,24 @@ except:
      print("Please set up configuration file `configuration.json`. It was prepopulated with some generic defaults :)")
      print("Exiting")
      exit()
-    
+
 config =  json.load(config_file)
-my_feeds = config['Feeds']
-my_authors = config['Authors']
-my_keywords = config['Keywords']
+
+filters = config['Filters']
+my_feeds = filters['Feeds']
+my_authors = filters['Authors']
+my_keywords = filters['Keywords']
+
+preferences = config['Preferences']
 
 entries_list = []
+matches_list = []
+config_file.close()
 
 # Process feeds
 for feed_name in my_feeds:
 
-    # Obtain and parse html 
+    # Obtain and parse html
     url = "https://arxiv.org/list/" + feed_name + "/new"
     feed = requests.get(url)
     soup = BeautifulSoup(feed.text, "html.parser")
@@ -84,13 +91,15 @@ for feed_name in my_feeds:
 
     for i in range(len(articles)):
         entries_list.append(Entry(get_title(articles[i]), get_authors(articles[i]), get_abstract(articles[i]), get_url(article_tops[i])))
+        if entries_list[-1].search(my_authors, my_keywords):
+            matches_list.append(entries_list[-1])
 
 
 # Search entries and write to output file
 output_file = open("output.txt", "w")
+output_file.write(f"Matched {len(matches_list)} new articles from {len(entries_list)} total\n\n")
 
-for entry in entries_list:
-    if entry.search(my_authors, my_keywords):
-        output_file.write(str(entry) + "\n\n")
+for entry in matches_list:
+    output_file.write(str(entry) + "\n\n")
 
 output_file.close()

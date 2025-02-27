@@ -1,4 +1,23 @@
 output.txt
 configuration.json
 .vscode\
+.vscode/**
+.venv/**
+.ropeproject/**
 
+*.key
+*.pem
+*.env
+*.config
+*.log
+*.swp
+*.DS_Store
+Thumbs.db
+/bin
+/build
+/dist
+/target
+/node_modules
+/vendor
+/.venv
+/.gradle
