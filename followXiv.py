@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import re
 import json
 import requests
+import shutil
 
 # Functions for processing html file
 def get_authors(article):
@@ -55,7 +56,14 @@ class Entry:
 ## Main Program
 
 # Load user configuration
-config_file = open("configuration.json", "r")
+try:
+    config_file = open("configuration.json", "r")
+except:
+     shutil.copy("sample_configuration.json", "configuration.json")
+     print("Please set up configuration file `configuration.json`. It was prepopulated with some generic defaults :)")
+     print("Exiting")
+     exit()
+    
 config =  json.load(config_file)
 my_feeds = config['Feeds']
 my_authors = config['Authors']
