@@ -1,8 +1,11 @@
+# GNU-GPL license, v3 or later
+
 from bs4 import BeautifulSoup
 import re
 import json
 import requests
 import shutil
+from pyzotero import zotero
 from datetime import datetime
 
 # Functions for processing html file
@@ -53,6 +56,22 @@ class Entry:
                 return True
         return False
 
+    def zoterify(self, zlib, col):
+        # add zotero item
+        template = zlib.item_template('Preprint')
+        template['title'] = self.title
+        template['url'] = self.link # self.link[:18]+"pdf"+self.link[21:]
+        template['collections'] = [col]
+        template['libraryCatalog'] = "arXiv.org"
+        template['abstractNote'] = self.abstract
+        template['creators'] = [template['creators'][0] for i in range(len(self.authors))]
+        for i in range(len(self.authors)):
+            splitname = self.authors[i].split()
+            template['creators'][i]['lastName'] = splitname[-1]
+            template['creators'][i]['firstName'] = " ".join(splitname[:-1])
+        resp = zlib.create_items([template])
+        return resp
+
 
 ## Main Program
 
@@ -78,6 +97,19 @@ entries_list = []
 matches_list = []
 config_file.close()
 
+# Set up Zotero
+if preferences['UseZotero']:
+    zinfo = config['Zotero']
+    zlib = zotero.Zotero(zinfo['LibraryID'],zinfo['LibraryType'],zinfo['APIToken'])
+    try:
+        collection = {"name":datetime.now().strftime("%Y-%m-%d"), "parentCollection":zinfo['followXivCID']}
+    except:
+        print("Please make sure you have correctly specified your library ID, API token, and the collection ID in which followXiv should store its results.")
+        print("Exiting")
+        exit()
+    zcol = zlib.create_collections([collection])
+    zkey = zcol['successful']['0']['key'] # key for today's collection, to add stuff to
+
 # Process feeds
 for feed_name in my_feeds:
 
@@ -101,5 +133,7 @@ output_file.write(f"Matched {len(matches_list)} new articles from {len(entries_l
 
 for entry in matches_list:
     output_file.write(str(entry) + "\n\n")
+    if preferences['UseZotero']:
+        entry.zoterify(zlib, zkey)
 
 output_file.close()
