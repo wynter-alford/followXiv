@@ -63,7 +63,7 @@ class Entry:
         template['url'] = self.link # self.link[:18]+"pdf"+self.link[21:]
         template['collections'] = [col]
         template['libraryCatalog'] = "arXiv.org"
-        template['abstractNote'] = self.abstract
+        template['abstractNote'] = f"[followXiv matched {self.matched}]\n\n {self.abstract}"
         template['creators'] = [template['creators'][0] for i in range(len(self.authors))]
         for i in range(len(self.authors)):
             splitname = self.authors[i].split()
