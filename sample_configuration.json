@@ -1,21 +1,20 @@
 {
-    "Filters": {
-        "Feeds": [
-            "quant-ph",
-            "cond-mat.stat-mech"
-        ],
-        "Authors": [
-            "Wynter Alford"
-        ],
+  "Filters": {
+    "Feeds": ["quant-ph", "cond-mat.stat-mech"],
+    "Authors": ["Wynter Alford"],
 
-        "Keywords": [
-            "thermodynamic",
-            "spectral density",
-            "pseudomode"
-        ]
-    },
+    "Keywords": ["thermodynamic", "spectral density", "pseudomode"]
+  },
 
-    "Preferences": {
-        "MatchResubmissions": false
-    }
+  "Preferences": {
+    "MatchResubmissions": false,
+    "UseZotero": true
+  },
+
+  "Zotero": {
+    "LibraryID": 12345678,
+    "LibraryType": "user",
+    "APIToken": "See1eeEE23EE4EEcret5s",
+    "followXivCID": "ABCDEFGH"
+  }
 }
