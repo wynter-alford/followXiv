@@ -32,6 +32,5 @@ Zotero integration relies heavily on the Pyzotero package: http://doi.org/10.528
 - **Some kind of UI** that isn't just the python script and a json file.
 - **"Run Daily" functionality** or customizable repetition that is part of the package, rather than relying on setting up ``cron``.
 - **Monitor for citations?**: Longer term, not sure how feasible this one is, but it would be nice to be able to flag papers that cite particular references.
-- **Integration with Zotero?**: Longer term, I'd love to look into how Zotero plugins work and see if there's a way to add matching papers directly into a folder in Zotero.
 
 Issues & PRs welcome.
