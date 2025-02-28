@@ -7,6 +7,7 @@ import requests
 import shutil
 from pyzotero import zotero
 from datetime import datetime
+from copy import deepcopy
 
 # Functions for processing html file
 def get_authors(article):
@@ -64,7 +65,7 @@ class Entry:
         template['collections'] = [col]
         template['libraryCatalog'] = "arXiv.org"
         template['abstractNote'] = f"[followXiv matched {self.matched}]\n\n {self.abstract}"
-        template['creators'] = [template['creators'][0] for i in range(len(self.authors))]
+        template['creators'] = [deepcopy(template['creators'][0]) for i in range(len(self.authors))]
         for i in range(len(self.authors)):
             splitname = self.authors[i].split()
             template['creators'][i]['lastName'] = splitname[-1]
