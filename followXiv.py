@@ -72,6 +72,12 @@ class Entry:
             template['creators'][i]['firstName'] = " ".join(splitname[:-1])
         resp = zlib.create_items([template])
         return resp
+    
+    def __eq__(self, other):
+        return self.link == other.link
+    
+    def __hash__(self):
+        return hash(self.link)
 
 
 ## Main Program
@@ -95,7 +101,7 @@ my_keywords = filters['Keywords']
 preferences = config['Preferences']
 
 entries_list = []
-matches_list = []
+matches = set()
 config_file.close()
 
 # Set up Zotero
@@ -125,14 +131,13 @@ for feed_name in my_feeds:
     for i in range(len(articles)):
         entries_list.append(Entry(get_title(articles[i]), get_authors(articles[i]), get_abstract(articles[i]), get_url(article_tops[i])))
         if entries_list[-1].search(my_authors, my_keywords):
-            matches_list.append(entries_list[-1])
-
+            matches.add(entries_list[-1])
 
 # Search entries and write to output file
 output_file = open("output.txt", "w")
-output_file.write(f"Matched {len(matches_list)} new articles from {len(entries_list)} total\n\n")
+output_file.write(f"Matched {len(matches)} new articles from {len(entries_list)} total\n\n")
 
-for entry in matches_list:
+for entry in matches:
     output_file.write(str(entry) + "\n\n")
     if preferences['UseZotero']:
         entry.zoterify(zlib, zkey)

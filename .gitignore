@@ -2,6 +2,7 @@ output.txt
 configuration.json
 .vscode\
 .vscode/**
+.idea/
 .venv/**
 .ropeproject/**
 
