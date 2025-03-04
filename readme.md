@@ -12,7 +12,7 @@ Before first usage, create a file ``configuration.json`` to contain your prefere
 
 All steps are then performed by the followXiv.py script. Papers found by the filter are saved to ``output.txt`` with their title, authors, abstract, and url.
 
-A way to make this run every weekday morning on Linux/Unix systems is to run ``crontab -e`` and then paste ``0 9 * * 1-5 cd [installation path]/followXiv && python3 followXiv.py && mv output.txt "$(date -I).txt"``. There are probably other clever options that I haven't thought of. Also note that this won't auto-update.
+A way to make this run every weekday morning on Linux/Unix systems is to run ``crontab -e`` and then paste ``0 9 * * 1-5 cd [PATH-TO-FOLLOWXIV]/followXiv && git reset --hard HEAD && git pull && [PATH-TO-ENVIRONMENT]/python3 followXiv.py && mv output.txt "$(date -I).txt" >/dev/null``. There are probably other clever options that I haven't thought of, and I'm not sure if there's a similar method for Windows. The '9' as the second number means run at 09:00; this time can be changed but should be set so that your computer reliably has internet access at the time or it will return an error.
 
 ## Zotero Integration:
 
