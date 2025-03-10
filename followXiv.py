@@ -1,6 +1,4 @@
-#  followXiv.py
-#  A script to monitor new papers on arXiv with the option of adding them to a Zotero folder for easy viewing.
-#  Copyright (C) 2025  Wynter Alford
+#  followXiv.py    Copyright (C) 2025    Wynter Alford
 
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
