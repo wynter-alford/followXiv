@@ -64,21 +64,21 @@ class Entry:
                 return True
         return False
 
-    def zoterify(self, zlib, col):
+    def zoterify(self, template, zlib, col):
         # add zotero item
-        template = zlib.item_template('Preprint')
+        template = deepcopy(template)
         template['title'] = self.title
         template['url'] = self.link  # self.link[:18]+"pdf"+self.link[21:]
         template['collections'] = [col]
         template['libraryCatalog'] = "arXiv.org"
-        template['abstractNote'] = f"[followXiv matched {self.matched}]\n\n {self.abstract}"
+        template['abstractNote'] = str(self.abstract)
         template['creators'] = [deepcopy(template['creators'][0]) for i in range(len(self.authors))]
+        template['extra'] = f"followXiv matched: {self.matched}"
         for i in range(len(self.authors)):
             splitname = self.authors[i].split()
             template['creators'][i]['lastName'] = splitname[-1]
             template['creators'][i]['firstName'] = " ".join(splitname[:-1])
-        resp = zlib.create_items([template])
-        return resp
+        return template
 
     def __eq__(self, other):
         return self.link == other.link
@@ -106,13 +106,14 @@ my_authors = filters['Authors']
 my_keywords = filters['Keywords']
 
 preferences = config['Preferences']
+use_zotero = preferences['UseZotero']
 
 entries_list = []
 matches = set()
 config_file.close()
 
 # Set up Zotero
-if preferences['UseZotero']:
+if use_zotero:
     zinfo = config['Zotero']
     zlib = zotero.Zotero(zinfo['LibraryID'], zinfo['LibraryType'], zinfo['APIToken'])
     collection = {"name": datetime.now().strftime("%Y-%m-%d"), "parentCollection": zinfo['followXivCID']}
@@ -151,12 +152,11 @@ for feed_name in my_feeds:
             matches.add(entries_list[-1])
 
 # Search entries and write to output file
-output_file = open("output.txt", "w")
-output_file.write(f"Matched {len(matches)} new articles from {len(entries_list)} total\n\n")
+with open("output.txt", "w") as output_file:
+    output_file.write(f"Matched {len(matches)} new articles from {len(entries_list)} total\n\n")
+    output_file.write('\n\n'.join(str(entry) for entry in matches))
 
-for entry in matches:
-    output_file.write(str(entry) + "\n\n")
-    if preferences['UseZotero']:
-        entry.zoterify(zlib, zkey)
-
-output_file.close()
+if use_zotero:
+    template = zlib.item_template('Preprint')
+    items = [entry.zoterify(template, zlib, zkey) for entry in matches]
+    resp = zlib.create_items(items)
