@@ -1,13 +1,16 @@
 # GNU-GPL license, v3 or later
 
-from bs4 import BeautifulSoup
-import re
 import json
-import requests
+import re
 import shutil
-from pyzotero import zotero
-from datetime import datetime
 from copy import deepcopy
+from datetime import datetime
+
+import requests
+from bs4 import BeautifulSoup
+from pyzotero import zotero
+from pyzotero.zotero_errors import UserNotAuthorised, PyZoteroError
+
 
 # Functions for processing html file
 def get_authors(article):
@@ -16,20 +19,24 @@ def get_authors(article):
     pattern = re.compile(r'">(.+?)</a>')
     return pattern.findall(section)
 
+
 def get_title(article):
     html_string = str(article)
     pattern = re.compile(r'class="descriptor">Title:</span>\s*(.*?)\s*</div>', re.DOTALL)
     return pattern.findall(html_string)
+
 
 def get_abstract(article):
     html_string = str(article)
     pattern = re.compile(r'<p class="mathjax">\s*(.*?)\s*</p>', re.DOTALL)
     return pattern.findall(html_string)
 
+
 def get_url(article):
     html_string = str(article)
     pattern = re.compile(r'arXiv:(.+?)\n')
     return "https://arxiv.org/abs/" + pattern.findall(html_string)[0]
+
 
 # Functions for processing individual entries
 class Entry:
@@ -48,9 +55,9 @@ class Entry:
     def search(self, author_list, term_list):
         if (not self.isNew) and (not preferences["MatchResubmissions"]): return False
         for author in author_list:
-                    if author in self.authors:
-                        self.matched = author
-                        return True
+            if author in self.authors:
+                self.matched = author
+                return True
         for term in term_list:
             if term.lower() in self.title.lower() or term.lower() in self.abstract.lower():
                 self.matched = term
@@ -61,7 +68,7 @@ class Entry:
         # add zotero item
         template = zlib.item_template('Preprint')
         template['title'] = self.title
-        template['url'] = self.link # self.link[:18]+"pdf"+self.link[21:]
+        template['url'] = self.link  # self.link[:18]+"pdf"+self.link[21:]
         template['collections'] = [col]
         template['libraryCatalog'] = "arXiv.org"
         template['abstractNote'] = f"[followXiv matched {self.matched}]\n\n {self.abstract}"
@@ -72,10 +79,10 @@ class Entry:
             template['creators'][i]['firstName'] = " ".join(splitname[:-1])
         resp = zlib.create_items([template])
         return resp
-    
+
     def __eq__(self, other):
         return self.link == other.link
-    
+
     def __hash__(self):
         return hash(self.link)
 
@@ -85,13 +92,13 @@ class Entry:
 # Load user configuration
 try:
     config_file = open("configuration.json", "r")
-except:
-     shutil.copy("sample_configuration.json", "configuration.json")
-     print("Please set up configuration file `configuration.json`. It was prepopulated with some generic defaults :)")
-     print("Exiting")
-     exit()
+except OSError:
+    shutil.copy("sample_configuration.json", "configuration.json")
+    print("Please set up configuration file `configuration.json`. It was prepopulated with some generic defaults :)")
+    print("Exiting")
+    exit()
 
-config =  json.load(config_file)
+config = json.load(config_file)
 
 filters = config['Filters']
 my_feeds = filters['Feeds']
@@ -107,15 +114,24 @@ config_file.close()
 # Set up Zotero
 if preferences['UseZotero']:
     zinfo = config['Zotero']
-    zlib = zotero.Zotero(zinfo['LibraryID'],zinfo['LibraryType'],zinfo['APIToken'])
+    zlib = zotero.Zotero(zinfo['LibraryID'], zinfo['LibraryType'], zinfo['APIToken'])
+    collection = {"name": datetime.now().strftime("%Y-%m-%d"), "parentCollection": zinfo['followXivCID']}
     try:
-        collection = {"name":datetime.now().strftime("%Y-%m-%d"), "parentCollection":zinfo['followXivCID']}
-    except:
-        print("Please make sure you have correctly specified your library ID, API token, and the collection ID in which followXiv should store its results.")
+        zcol = zlib.create_collections([collection])
+    except UserNotAuthorised as auth_err:
+        print(f"Authorization failed! {str(auth_err)}")
         print("Exiting")
         exit()
-    zcol = zlib.create_collections([collection])
-    zkey = zcol['successful']['0']['key'] # key for today's collection, to add stuff to
+    except PyZoteroError as e:
+        print(f"Zotero error: {e}")
+        print("Exiting")
+        exit()
+    except:
+        print(
+            "Please make sure you have correctly specified your library ID, API token, and the collection ID in which followXiv should store its results.")
+        print("Exiting")
+        exit()
+    zkey = zcol['successful']['0']['key']  # key for today's collection, to add stuff to
 
 # Process feeds
 for feed_name in my_feeds:
@@ -129,7 +145,8 @@ for feed_name in my_feeds:
     articles = soup.find_all('dd')
 
     for (article, article_top) in zip(articles, article_tops):
-        entries_list.append(Entry(get_title(article), get_authors(article), get_abstract(article), get_url(article_top)))
+        entries_list.append(
+            Entry(get_title(article), get_authors(article), get_abstract(article), get_url(article_top)))
         if entries_list[-1].search(my_authors, my_keywords):
             matches.add(entries_list[-1])
 
