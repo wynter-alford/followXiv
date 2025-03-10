@@ -1,10 +1,25 @@
-# GNU-GPL license, v3 or later
+#  followXiv.py
+#  A script to monitor new papers on arXiv with the option of adding them to a Zotero folder for easy viewing.
+#  Copyright (C) 2025  Wynter Alford
+
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import json
 import re
 import shutil
 from copy import deepcopy
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import requests
 from bs4 import BeautifulSoup
@@ -47,7 +62,7 @@ class Entry:
         self.abstract = abstract[0]
         self.link = link
         self.matched = ""
-        self.isNew = datetime.now().strftime("%Y%m")[2:] == self.link[-10:-6]
+        self.isNew = (datetime.now() - timedelta(max(1,datetime.now().weekday()+6)%7-3)).strftime("%Y%m")[2:] == self.link[-10:-6]
 
     def __str__(self):
         return f"[Matched {self.matched}]\nTitle: {self.title}\nAuthors: {self.authors}\nAbstract: {self.abstract}\nLink: {self.link}"
