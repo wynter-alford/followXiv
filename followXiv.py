@@ -159,4 +159,10 @@ with open("output.txt", "w") as output_file:
 if use_zotero:
     template = zlib.item_template('Preprint')
     items = [entry.zoterify(template, zlib, zkey) for entry in matches]
-    resp = zlib.create_items(items)
+    # zotero lets us batch create up to 50 objects per call, so if we somehow matched more than that, split the list up
+    size = 50
+    if len(items) > size:
+        for i in range(0, len(items), size):
+            zlib.create_items(items[i:i + size])
+    else:
+        zlib.create_items(items)
