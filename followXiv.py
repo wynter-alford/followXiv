@@ -128,8 +128,8 @@ for feed_name in my_feeds:
     article_tops = soup.find_all('dt')
     articles = soup.find_all('dd')
 
-    for i in range(len(articles)):
-        entries_list.append(Entry(get_title(articles[i]), get_authors(articles[i]), get_abstract(articles[i]), get_url(article_tops[i])))
+    for (article, article_top) in zip(articles, article_tops):
+        entries_list.append(Entry(get_title(article), get_authors(article), get_abstract(article), get_url(article_top)))
         if entries_list[-1].search(my_authors, my_keywords):
             matches.add(entries_list[-1])
 
