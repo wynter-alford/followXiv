@@ -10,8 +10,8 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 
-#   You should have received a copy of the GNU General Public License
-#   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import json
 import re
@@ -22,7 +22,7 @@ from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup
 from pyzotero import zotero
-from pyzotero.zotero_errors import UserNotAuthorised, PyZoteroError
+from pyzotero.zotero_errors import *
 
 
 # Functions for processing html file
