@@ -59,23 +59,24 @@ class Entry:
         self.authors = authors
         self.abstract = abstract[0]
         self.link = link
-        self.matched = ""
+        self.matches = []
         self.isNew = (datetime.now() - timedelta(max(1,datetime.now().weekday()+6)%7-3)).strftime("%Y%m")[2:] == self.link[-10:-6]
 
     def __str__(self):
-        return f"[Matched {self.matched}]\nTitle: {self.title}\nAuthors: {self.authors}\nAbstract: {self.abstract}\nLink: {self.link}"
+        return f"[Matched {self.list_matches()}]\nTitle: {self.title}\nAuthors: {self.authors}\nAbstract: {self.abstract}\nLink: {self.link}"
 
-    def search(self, author_list, term_list):
+    def list_matches(self):
+        return ', '.join(self.matches)
+
+    def search(self, author_list, term_list) -> bool:
         if (not self.isNew) and (not preferences["MatchResubmissions"]): return False
         for author in author_list:
             if author in self.authors:
-                self.matched = author
-                return True
+                self.matches.append(author)
         for term in term_list:
             if term.lower() in self.title.lower() or term.lower() in self.abstract.lower():
-                self.matched = term
-                return True
-        return False
+                self.matches.append(term)
+        return len(self.matches) > 0
 
     def zoterify(self, template, zlib, col):
         # add zotero item
@@ -86,7 +87,7 @@ class Entry:
         template['libraryCatalog'] = "arXiv.org"
         template['abstractNote'] = str(self.abstract)
         template['creators'] = [deepcopy(template['creators'][0]) for i in range(len(self.authors))]
-        template['extra'] = f"followXiv matched: {self.matched}"
+        template['extra'] = f"followXiv matched: {self.list_matches()}"
         for i in range(len(self.authors)):
             splitname = self.authors[i].split()
             template['creators'][i]['lastName'] = splitname[-1]
@@ -132,7 +133,7 @@ if use_zotero:
     collection = {"name": datetime.now().strftime("%Y-%m-%d"), "parentCollection": zinfo['followXivCID']}
     try:
         zcol = zlib.create_collections([collection])
-    except UserNotAuthorised as auth_err:
+    except UserNotAuthorisedError as auth_err:
         print(f"Authorization failed! {str(auth_err)}")
         print("Exiting")
         exit()
@@ -160,7 +161,8 @@ for feed_name in my_feeds:
 
     for (article, article_top) in zip(articles, article_tops):
         entries_list.append(
-            Entry(get_title(article), get_authors(article), get_abstract(article), get_url(article_top)))
+            Entry(get_title(article), get_authors(article), get_abstract(article), get_url(article_top))
+        )
         if entries_list[-1].search(my_authors, my_keywords):
             matches.add(entries_list[-1])
 
@@ -176,6 +178,7 @@ if use_zotero:
     size = 50
     if len(items) > size:
         for i in range(0, len(items), size):
+            # todo will this cause an indexing error?
             zlib.create_items(items[i:i + size])
     else:
         zlib.create_items(items)
