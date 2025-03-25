@@ -15,7 +15,7 @@
 
 import json
 import re
-import shutil
+# import shutil
 from copy import deepcopy
 from datetime import datetime, timedelta
 
@@ -107,10 +107,12 @@ class Entry:
 try:
     config_file = open("configuration.json", "r")
 except OSError:
-    shutil.copy("sample_configuration.json", "configuration.json")
-    print("Please set up configuration file `configuration.json`. It was prepopulated with some generic defaults :)")
-    print("Exiting")
-    exit()
+    exec(open("followXiv-setup.py").read())
+    config_file = open("configuration.json", "r")
+    # shutil.copy("sample_configuration.json", "configuration.json")
+    # print("Please set up configuration file `configuration.json`. It was prepopulated with some generic defaults :)")
+    # print("Exiting")
+    
 
 config = json.load(config_file)
 
