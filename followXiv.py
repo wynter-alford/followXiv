@@ -19,10 +19,16 @@ import re
 from copy import deepcopy
 from datetime import datetime, timedelta
 
-import requests
-from bs4 import BeautifulSoup
-from pyzotero import zotero
-from pyzotero.zotero_errors import *
+try:
+    import requests
+    from bs4 import BeautifulSoup
+    from pyzotero import zotero
+    from pyzotero.zotero_errors import *
+except ModuleNotFoundError as err:
+    print(err)
+    print("\nAn error occurred because a required package is missing. FollowXiv requires the following packages: requests, bs4, pyzotero. Please ensure they are all installed, then try again.")
+    print("\nExiting")
+    exit()
 
 
 # Functions for processing html file
