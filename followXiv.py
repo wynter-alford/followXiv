@@ -93,7 +93,7 @@ class Entry:
         template['libraryCatalog'] = "arXiv.org"
         template['abstractNote'] = str(self.abstract)
         template['creators'] = [deepcopy(template['creators'][0]) for i in range(len(self.authors))]
-        template['extra'] = f"followXiv matched: {self.list_matches()}"
+        template['extra'] = f"fX: {self.list_matches()}"
         for i in range(len(self.authors)):
             splitname = self.authors[i].split()
             template['creators'][i]['lastName'] = splitname[-1]
