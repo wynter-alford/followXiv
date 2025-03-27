@@ -15,14 +15,20 @@
 
 import json
 import re
-import shutil
+# import shutil
 from copy import deepcopy
 from datetime import datetime, timedelta
 
-import requests
-from bs4 import BeautifulSoup
-from pyzotero import zotero
-from pyzotero.zotero_errors import *
+try:
+    import requests
+    from bs4 import BeautifulSoup
+    from pyzotero import zotero
+    from pyzotero.zotero_errors import *
+except ModuleNotFoundError as err:
+    print(err)
+    print("\nAn error occurred because a required package is missing. FollowXiv requires the following packages: requests, bs4, pyzotero. Please ensure they are all installed, then try again.")
+    print("\nExiting")
+    exit()
 
 
 # Functions for processing html file
@@ -87,7 +93,7 @@ class Entry:
         template['libraryCatalog'] = "arXiv.org"
         template['abstractNote'] = str(self.abstract)
         template['creators'] = [deepcopy(template['creators'][0]) for i in range(len(self.authors))]
-        template['extra'] = f"followXiv matched: {self.list_matches()}"
+        template['extra'] = f"fX: {self.list_matches()}"
         for i in range(len(self.authors)):
             splitname = self.authors[i].split()
             template['creators'][i]['lastName'] = splitname[-1]
@@ -107,10 +113,12 @@ class Entry:
 try:
     config_file = open("configuration.json", "r")
 except OSError:
-    shutil.copy("sample_configuration.json", "configuration.json")
-    print("Please set up configuration file `configuration.json`. It was prepopulated with some generic defaults :)")
-    print("Exiting")
-    exit()
+    exec(open("followXiv-setup.py").read())
+    config_file = open("configuration.json", "r")
+    # shutil.copy("sample_configuration.json", "configuration.json")
+    # print("Please set up configuration file `configuration.json`. It was prepopulated with some generic defaults :)")
+    # print("Exiting")
+    
 
 config = json.load(config_file)
 
