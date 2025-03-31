@@ -75,6 +75,10 @@ def reconfigure():
             config_zotero()
         elif i3 == "5":
             config_other()
+        elif i3 == "0":
+            print_space()
+            print("Proceeding with full interactive setup.")
+            first_configure()
         elif i3 == "q":
             print("Exiting setup. Your changes will not be saved.")
             exit()
@@ -94,18 +98,18 @@ def first_configure():
     config_zotero()
     config_other()
     tprint("\n\n\n Setup complete! Enter 'a' to adjust settings further, 's' to save and exit, or 'q' to quit without saving.")
-    i4 = input("\nEnter a choice: ")
-    if i4 == "a":
-        reconfigure()
-    elif i4 == "s":
-        save_and_exit()
-    elif i4 == "q":
-        print("Exiting setup.")
-        exit()
-    else:
-        print("Invalid choice.")
-        reconfigure()
-    return
+    while True:
+        i4 = input("\nEnter a choice: ")
+        if i4 == "a":
+            reconfigure()
+        elif i4 == "s":
+            save_and_exit()
+        elif i4 == "q":
+            print("Exiting setup.")
+            exit()
+        else:
+            print("Invalid choice.")
+            reconfigure()
 
 # Configure feed list
 def config_feed_list():
@@ -195,10 +199,7 @@ def config_author_list():
             CONFIGURATION["Filters"]["Authors"] = authors
             print("\nAll authors removed.")
         elif i5 == "":
-            if NEW_SETUP:
-                return
-            else:
-                reconfigure()
+            return
         else:
             print("\nInvalid choice.")
         print_space()
@@ -244,10 +245,7 @@ def config_keyword_list():
             CONFIGURATION["Filters"]["Keywords"] = keywords
             print("\nAll keywords removed.")
         elif i5 == "":
-            if NEW_SETUP:
-                return
-            else:
-                reconfigure()
+            return
         else:
             print("\nInvalid choice.")
 
