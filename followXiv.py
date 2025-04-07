@@ -149,7 +149,8 @@ if use_zotero:
         print(f"Zotero error: {e}")
         print("Exiting")
         exit()
-    except:
+    except Exception as e:
+        print(f"Error: {e}")
         print(
             "Please make sure you have correctly specified your library ID, API token, and the collection ID in which followXiv should store its results.")
         print("Exiting")
