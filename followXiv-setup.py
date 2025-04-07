@@ -62,6 +62,7 @@ def reconfigure():
         tprint("\n3. Change keyword list")
         tprint("\n4. Change Zotero settings")
         tprint("\n5. Change other settings")
+        tprint("\n6. Set followXiv to run daily using cron")
         tprint("\n0. Proceed with full interactive setup")
         tprint("\nOr enter 'l' to view licensing information, 's' to save and exit, or 'q' to quit without saving.")
         i3 = input("\nEnter a choice: ")
@@ -75,6 +76,8 @@ def reconfigure():
             config_zotero()
         elif i3 == "5":
             config_other()
+        elif i3 == "6":
+            config_crontab()
         elif i3 == "0":
             print_space()
             print("Proceeding with full interactive setup.")
@@ -95,6 +98,7 @@ def first_configure():
     config_feed_list()
     config_author_list()
     config_keyword_list()
+    config_crontab()
     config_zotero()
     config_other()
     tprint("\n\n\n Setup complete! Enter 'a' to adjust settings further, 's' to save and exit, or 'q' to quit without saving.")
@@ -354,6 +358,72 @@ def config_zotero_new():
     else:
         tprint("\nInvalid choice. Please enter 'y' or 'n'.")
         config_zotero()
+
+
+def config_crontab(): # TODO: test this
+    while True:
+        print_space()
+        tprint("Would you like help setting followXiv to run daily on this computer using crontab? This will likely not work on Windows systems.")
+        tprint("Note that this feature is experimental and may return errors. For best results, configure cron manually.")
+        i5 = input("\nEnter 'y' to set up crontab or 'n' to skip this step: ")
+        if i5 == 'n' or i5 == 'N':
+            tprint("\n Crontab setup skipped.")
+            return
+        elif i5 == 'y' or i5 == 'Y':
+            import os
+            if os.name == 'posix':
+                try: check_cron = os.system("crontab -l")
+                except: 
+                    tprint("Sorry, your system appears to be incompatible with cron setup :(")
+                    return
+                if check_cron > 0: 
+                    tprint("Sorry, your system appears to be incompatible with cron setup :(")
+                    return
+            else:
+                tprint("Sorry, your system appears to be incompatible with cron setup :(")
+                return
+
+            # get path to virtual env
+            print_space()
+            tprint("First, you'll need the path to the virtual environment in which the followXiv packages are stored. This might be something like ./venv/bin/python or perhaps /opt/anaconda3/envs/followXiv/bin/python")
+            tprint("If you don't know the path, you can find it by running 'which python' in the terminal.")
+            tprint(f"\nYour path appears to be \"{os.popen("which python").read().strip()}\". If this is correct, press enter; otherwise, enter the path to your virtual environment.")
+            while True:
+                venv_path = input("\nEnter the path to your virtual environment: ")
+                if venv_path.strip() == "": 
+                    venv_path = os.popen("which python").read().strip()
+                    break
+                else:
+                    if os.path.isfile(venv_path): break
+                    else: tprint("\nInvalid path. Please enter the full path to your virtual environment.")
+            
+            # get path to followXiv directory
+            print_space()
+            tprint("Next, you'll need the full path to the followXiv directory (not using shortcuts like ~). This might be something like /home/user/followXiv")
+            tprint("If you don't know the path, you can find it by running 'pwd' in the terminal.")
+            tprint(f"\nYour path appears to be \"{os.popen("pwd").read().strip()}\". If this is correct, press enter; otherwise, enter the path to your followXiv directory.")
+            while True:
+                followxiv_path = input("\nEnter the full path to followXiv.py: ")
+                if followxiv_path.strip() == "":
+                    followxiv_path = os.popen("pwd").read().strip()
+                    break
+                else:
+                    if os.path.isdir(followxiv_path): break
+                    else: tprint("\nInvalid path. Please ensure that the path points to the directory containing followXiv.py.")
+
+            # choose run time
+            print_space()
+            tprint("What time would you like followXiv to run every weekday? Note that the cron job will fail if your computer is not connected to the internet at the time at which it is scheduled. Enter this in 24 hour format: for example, enter 13 for 1:00 p.m.")
+            run_time = input("\nEnter the time to run followXiv (in 24 hour format): ")
+            tprint("Setting up crontab. Your terminal may give a warning or ask for permission during this step.")
+            
+            # attempt setup
+            try: 
+                followxiv_path = os.system("pwd")
+                os.system(f'(crontab -l ; echo "0 {run_time} * * 1-5 cd {followxiv_path} && git reset --hard HEAD && git pull && {venv_path} followXiv.py && mv output.txt "$(date -I).txt" >/dev/null")| crontab -')
+            except OSError as err:
+                tprint(f"An error occurred: {err}. Please try again, or set up cron manually.")
+            return
 
 
 def config_other():
