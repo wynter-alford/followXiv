@@ -387,7 +387,7 @@ def config_crontab(): # TODO: test this
             print_space()
             tprint("First, you'll need the path to the virtual environment in which the followXiv packages are stored. This might be something like ./venv/bin/python or perhaps /opt/anaconda3/envs/followXiv/bin/python")
             tprint("If you don't know the path, you can find it by running 'which python' in the terminal.")
-            tprint(f"\nYour path appears to be \"{os.popen("which python").read().strip()}\". If this is correct, press enter; otherwise, enter the path to your virtual environment.")
+            tprint(f"\nYour path appears to be \"{os.popen('which python').read().strip()}\". If this is correct, press enter; otherwise, enter the path to your virtual environment.")
             while True:
                 venv_path = input("\nEnter the path to your virtual environment: ")
                 if venv_path.strip() == "": 
