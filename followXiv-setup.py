@@ -401,7 +401,7 @@ def config_crontab(): # TODO: test this
             print_space()
             tprint("Next, you'll need the full path to the followXiv directory (not using shortcuts like ~). This might be something like /home/user/followXiv")
             tprint("If you don't know the path, you can find it by running 'pwd' in the terminal.")
-            tprint(f"\nYour path appears to be \"{os.popen("pwd").read().strip()}\". If this is correct, press enter; otherwise, enter the path to your followXiv directory.")
+            tprint(f"\nYour path appears to be \"{os.popen('pwd').read().strip()}\". If this is correct, press enter; otherwise, enter the path to your followXiv directory.")
             while True:
                 followxiv_path = input("\nEnter the full path to followXiv.py: ")
                 if followxiv_path.strip() == "":
