@@ -93,6 +93,7 @@ class Entry:
         template['libraryCatalog'] = "arXiv.org"
         template['abstractNote'] = str(self.abstract)
         template['creators'] = [deepcopy(template['creators'][0]) for i in range(len(self.authors))]
+        template['date'] = datetime.now().strftime("%Y-%m-%d")
         template['extra'] = f"fX: {self.list_matches()}"
         for i in range(len(self.authors)):
             splitname = self.authors[i].split()
