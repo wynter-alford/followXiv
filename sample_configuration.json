@@ -15,6 +15,7 @@
     "LibraryID": 12345678,
     "LibraryType": "user",
     "APIToken": "See1eeEE23EE4EEcret5s",
-    "followXivCID": "ABCDEFGH"
+    "followXivCID": "ABCDEFGH",
+    "ZoteroPrefix": "fX"
   }
 }

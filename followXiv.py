@@ -84,7 +84,7 @@ class Entry:
                 self.matches.append(term)
         return len(self.matches) > 0
 
-    def zoterify(self, template, zlib, col):
+    def zoterify(self, template, col, zprefix):
         # add zotero item
         template = deepcopy(template)
         template['title'] = self.title
@@ -95,7 +95,7 @@ class Entry:
         template['creators'] = [deepcopy(template['creators'][0]) for i in range(len(self.authors))]
         template['date'] = datetime.now().strftime("%Y-%m-%d")
         template["accessDate"] = datetime.now().strftime("%Y-%m-%d")
-        template['extra'] = f"fX: {self.list_matches()}"
+        template['extra'] = f"{zprefix}: {self.list_matches()}"
         for i in range(len(self.authors)):
             splitname = self.authors[i].split()
             template['creators'][i]['lastName'] = splitname[-1]
@@ -141,6 +141,7 @@ if use_zotero:
     zinfo = config['Zotero']
     zlib = zotero.Zotero(zinfo['LibraryID'], zinfo['LibraryType'], zinfo['APIToken'])
     collection = {"name": datetime.now().strftime("%Y-%m-%d"), "parentCollection": zinfo['followXivCID']}
+    zprefix = zinfo['ZoteroPrefix']
     try:
         zcol = zlib.create_collections([collection])
     except UserNotAuthorisedError as auth_err:
@@ -184,7 +185,7 @@ with open("output.txt", "w") as output_file:
 
 if use_zotero:
     template = zlib.item_template('Preprint')
-    items = [entry.zoterify(template, zlib, zkey) for entry in matches]
+    items = [entry.zoterify(template, zkey, zprefix) for entry in matches]
     # zotero lets us batch create up to 50 objects per call, so if we somehow matched more than that, split the list up
     size = 50
     if len(items) > size:

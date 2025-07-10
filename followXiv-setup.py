@@ -213,11 +213,11 @@ def config_keyword_list():
     if NEW_SETUP:
         tprint("A sample keyword list has been provided. \n")
     while True:
-        tprint("Your current keyword list is:\n")
+        tprint("\nYour current keyword list is:\n\n")
         keywords = CONFIGURATION["Filters"]["Keywords"]
         for ind in range(len(keywords)):
             tprint(keywords[ind])
-        tprint("\nChoose an option from the following:")
+        tprint("\n\nChoose an option from the following:")
         tprint("1. Add a new keyword")
         tprint("2. Remove a keyword")
         tprint("3. Remove all keywords")
@@ -239,19 +239,19 @@ def config_keyword_list():
                 if i6 > 0 and i6 <= len(keywords):
                     keywords.pop(i6-1)
                     CONFIGURATION["Filters"]["Keywords"] = keywords
-                    print("\nFeed removed.")
+                    print("\nFeed removed.\n\n")
+                else:
+                    print("\nInvalid choice.\n\n")
             except:
-                print("\nInvalid choice.")
-            else:
-                print("\nInvalid choice.")
+                print("\nInvalid choice.\n\n")
         elif i5 == "3":
             keywords.clear()
             CONFIGURATION["Filters"]["Keywords"] = keywords
-            print("\nAll keywords removed.")
+            print("\nAll keywords removed.\n\n")
         elif i5 == "":
             return
         else:
-            print("\nInvalid choice.")
+            print("\nInvalid choice.\n\n")
 
 def config_zotero():
     # Set up Zotero for the first time
@@ -285,12 +285,14 @@ def config_zotero():
             tprint(f"API Token: {CONFIGURATION['Zotero']['APIToken']}")
             tprint(f"Library Type: {CONFIGURATION['Zotero']['LibraryType']}")
             tprint(f"Collection ID: {CONFIGURATION['Zotero']['followXivCID']}")
+            tprint(f"Zotero followXiv prefix: {CONFIGURATION['Zotero']['ZoteroPrefix']}")
             tprint("\nChoose an option from the following:")
             tprint("1. Change library ID")
             tprint("2. Change API token")
             tprint("3. Change library type")
             tprint("4. Change collection ID")
-            tprint("5. Disable Zotero")
+            tprint("5. Change Zotero followXiv prefix")
+            tprint("6. Disable Zotero")
             tprint("Or press enter to continue with setup.")
             i6 = input("\nEnter a choice: ")
             if i6 == "1":
@@ -319,6 +321,10 @@ def config_zotero():
                 CONFIGURATION["Zotero"]["followXivCID"] = i7
                 tprint("Collection ID updated.")
             elif i6 == "5":
+                tprint("Enter your desired prefix for followXiv match lists in Zotero.")
+                i42 = input("\nEnter your new Zotero followXiv prefix: ")
+                CONFIGURATION["Zotero"]["ZoteroPrefix"] = i42.strip()
+            elif i6 == "6":
                 CONFIGURATION['Preferences']['UseZotero'] = False
                 tprint("Zotero is now disabled.")
             elif i6 == "":
@@ -354,6 +360,12 @@ def config_zotero_new():
         CONFIGURATION["Zotero"]["APIToken"] = i7
         CONFIGURATION["Zotero"]["followXivCID"] = i9
         tprint("\n Zotero has been set up! If you encounter Zotero authentication errors, double-check your library ID, API token and collection ID.")
+        tprint("\n When followXiv adds papers to Zotero, it will indicate matches to your author and term lists in the 'Extra' field of the Zotero item. By default they are written in the form")
+        tprint('"fX: thermodynamic, quantum"')
+        tprint("If you would like to use a different prefix than 'fX', enter it now, or press enter to use the default:")
+        i12 = input("\nZotero followXiv prefix: ")
+        CONFIGURATION["Zotero"]["ZoteroPrefix"] = i12.strip() if i12.strip() else "fX"
+        tprint("\nZotero setup complete!")
         return
     else:
         tprint("\nInvalid choice. Please enter 'y' or 'n'.")
@@ -414,8 +426,17 @@ def config_crontab(): # TODO: test this
             # choose run time
             print_space()
             tprint("What time would you like followXiv to run every weekday? Note that the cron job will fail if your computer is not connected to the internet at the time at which it is scheduled. Enter this in 24 hour format: for example, enter 13 for 1:00 p.m.")
-            run_time = input("\nEnter the time to run followXiv (in 24 hour format): ")
-            tprint("Setting up crontab. Your terminal may give a warning or ask for permission during this step.")
+            while True:
+                run_time = input("\nEnter the time to run followXiv (in 24 hour format): ")
+                try: 
+                    rt = int(run_time)
+                    if rt < 0 or rt > 23:
+                        tprint("\nPlease enter a number between 0 and 23.")
+                    else:
+                        break
+                except: tprint("\nPlease enter a number between 0 and 23.")
+
+            tprint("Setting up crontab. On a Mac you may be shown a pop-up window; if so, click 'allow'.")
             
             # attempt setup
             try: 
