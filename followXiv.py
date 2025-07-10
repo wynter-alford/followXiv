@@ -141,7 +141,7 @@ if use_zotero:
     zinfo = config['Zotero']
     zlib = zotero.Zotero(zinfo['LibraryID'], zinfo['LibraryType'], zinfo['APIToken'])
     collection = {"name": datetime.now().strftime("%Y-%m-%d"), "parentCollection": zinfo['followXivCID']}
-    zprefix = zinfo['ZoteroPrefix']
+    zprefix = zinfo.get('ZoteroPrefix', 'fX') 
     try:
         zcol = zlib.create_collections([collection])
     except UserNotAuthorisedError as auth_err:
