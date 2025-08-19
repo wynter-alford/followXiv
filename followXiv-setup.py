@@ -341,6 +341,7 @@ def config_zotero_new():
     elif i5 == "y" or i5 == "Y":
         CONFIGURATION['Preferences']['UseZotero'] = True
         tprint("All right, let's get Zotero set up for you. First, you will need your Zotero library ID and API token. You can find these at https://www.zotero.org/settings/keys.")
+        tprint("If you are using a personal library, the library ID is your user ID. If using a group library, it is the group ID, which can be found in the URL for the group library.")
         tprint("\n Your library ID should be an 8-digit number, and your API token should be a 24-character string.")
         i6 = input("\nEnter your library ID: ")
         i7 = input("\nEnter your API token: ")
