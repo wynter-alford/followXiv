@@ -66,7 +66,6 @@ class Entry:
         self.abstract = abstract[0]
         self.link = link
         self.matches = []
-        self.isNew = (datetime.now() - timedelta(max(1,datetime.now().weekday()+6)%7-3)).strftime("%Y%m")[2:] == self.link[-10:-6]
 
     def __str__(self):
         return f"[Matched {self.list_matches()}]\nTitle: {self.title}\nAuthors: {self.authors}\nAbstract: {self.abstract}\nLink: {self.link}"
@@ -75,7 +74,6 @@ class Entry:
         return ', '.join(self.matches)
 
     def search(self, author_list, term_list) -> bool:
-        if (not self.isNew) and (not preferences["MatchResubmissions"]): return False
         for author in author_list:
             if author in self.authors:
                 self.matches.append(author)
@@ -168,8 +166,18 @@ for feed_name in my_feeds:
     feed = requests.get(url)
     soup = BeautifulSoup(feed.text, "html.parser")
 
-    article_tops = soup.find_all('dt')
-    articles = soup.find_all('dd')
+    if not preferences["MatchResubmissions"]:
+        try:
+            resubmission_pattern = re.compile('Replacement submissions \\(showing ([1-9]{1,2})')
+            resub_count_source = str(soup.find_all('h3'))
+            num_resubmissions = int(resubmission_pattern.findall(resub_count_source)[0])
+        except:
+            num_resubmissions = 0
+    else:
+        num_resubmissions = 0
+
+    article_tops = soup.find_all('dt')[:-num_resubmissions]
+    articles = soup.find_all('dd')[:-num_resubmissions]
 
     for (article, article_top) in zip(articles, article_tops):
         entries_list.append(
