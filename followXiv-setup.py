@@ -153,9 +153,11 @@ def config_feed_list():
             else:
                 print("\nInvalid choice.")
         elif i5 == "3":
-            feeds.clear()
-            CONFIGURATION["Filters"]["Feeds"] = feeds
-            print("\nAll feeds removed.")
+            ii5 = input("\nAre you sure you want to do this? If so, type 'yes':")
+            if ii5 == 'yes':
+                feeds.clear()
+                CONFIGURATION["Filters"]["Feeds"] = feeds
+                print("\nAll feeds removed.")
         elif i5 == "":
             return
         else:
@@ -199,9 +201,11 @@ def config_author_list():
             else:
                 print("\nInvalid choice.")
         elif i5 == "3":
-            authors.clear()
-            CONFIGURATION["Filters"]["Authors"] = authors
-            print("\nAll authors removed.")
+            ii5 = input("\nAre you sure you want to do this? If so, type 'yes':")
+            if ii5 == 'yes':
+                authors.clear()
+                CONFIGURATION["Filters"]["Authors"] = authors
+                print("\nAll authors removed.")
         elif i5 == "":
             return
         else:
@@ -245,9 +249,11 @@ def config_keyword_list():
             except:
                 print("\nInvalid choice.\n\n")
         elif i5 == "3":
-            keywords.clear()
-            CONFIGURATION["Filters"]["Keywords"] = keywords
-            print("\nAll keywords removed.\n\n")
+            ii5 = input("\nAre you sure you want to do this? If so, type 'yes':")
+            if ii5 == 'yes':
+                keywords.clear()
+                CONFIGURATION["Filters"]["Keywords"] = keywords
+                print("\nAll keywords removed.\n\n")
         elif i5 == "":
             return
         else:
