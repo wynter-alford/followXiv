@@ -28,6 +28,6 @@ Your library ID and API tokens can be managed at https://www.zotero.org/settings
 - **"And" conditions:** Allow conditions like "Author 1 AND Author 2" or "Keyword 1 AND Keyword 2 AND Keyword 3" for the filter
 - **Some kind of UI** that isn't just the python script and a json file.
 - **"Run Daily" functionality** or customizable repetition that is part of the package, rather than relying on setting up ``cron``.
-- **Improvements to followXiv-setup** including an option to help set up ``cron`` and greater setup customizability
+- **Improvements to followXiv-setup** for ease of use, including the ability to add multiple authors or keywords at once.
 
 Issues & PRs welcome.
