@@ -25,6 +25,15 @@ def print_space():
     tprint("\n")
 
 
+# Update configuration file with newly added feeds (new preference options, for example)
+if not "MatchAll" in CONFIGURATION["Preferences"]:
+    CONFIGURATION["Preferences"]["MatchAll"] = False
+if not "NegativeMatching" in CONFIGURATION["Preferences"]:
+    CONFIGURATION["Preferences"]["NegativeMatching"] = False
+if not "UseSubcollections" in CONFIGURATION["Zotero"]:
+    CONFIGURATION["Zotero"]["UseSubcollections"] = True
+
+
 # Header and license information
 def show_licensing():
     print_space()
@@ -298,7 +307,11 @@ def config_zotero():
             tprint("3. Change library type")
             tprint("4. Change collection ID")
             tprint("5. Change Zotero followXiv prefix")
-            tprint("6. Disable Zotero")
+            if CONFIGURATION['Zotero']['UseSubcollections']:
+                tprint("6. Disable subcollections (will store all matches in the main followXiv collection)")
+            else:
+                tprint("6. Enable subcollections (will create a new subcollection for matches each day)")
+            tprint("7. Disable Zotero")
             tprint("Or press enter to continue with setup.")
             i6 = input("\nEnter a choice: ")
             if i6 == "1":
@@ -331,6 +344,8 @@ def config_zotero():
                 i42 = input("\nEnter your new Zotero followXiv prefix: ")
                 CONFIGURATION["Zotero"]["ZoteroPrefix"] = i42.strip()
             elif i6 == "6":
+                CONFIGURATION['Zotero']['UseSubcollections'] = not CONFIGURATION['Zotero']['UseSubcollections']
+            elif i6 == "7":
                 CONFIGURATION['Preferences']['UseZotero'] = False
                 tprint("Zotero is now disabled.")
             elif i6 == "":
@@ -372,6 +387,15 @@ def config_zotero_new():
         tprint("If you would like to use a different prefix than 'fX', enter it now, or press enter to use the default:")
         i12 = input("\nZotero followXiv prefix: ")
         CONFIGURATION["Zotero"]["ZoteroPrefix"] = i12.strip() if i12.strip() else "fX"
+        while True:
+            tprint("Would you like (1) matches for each day to be stored in a new subcollection within your followXiv collection or (2) all matches to be stored directly in your followXiv collection?")
+            i13 = input("Enter 1 or 2: ")
+            if i13.strip() == "1": 
+                CONFIGURATION["Zotero"]["UseSubcollections"] = True
+                break
+            elif i13.strip() == "2": 
+                CONFIGURATION["Zotero"]["UseSubcollections"] = True
+                break
         tprint("\nZotero setup complete!")
         return
     else:
@@ -459,22 +483,15 @@ def config_other():
         print_space()
         tprint("Current settings are:")
         tprint(f"1. Match Resubmissions: {CONFIGURATION['Preferences']['MatchResubmissions']}")
+        tprint(f"2. Match All (enabling will ignore all authors and keywords): {CONFIGURATION['Preferences']['MatchAll']}")
+        tprint(f"3. Negative Matching (enabling will match all papers EXCEPT those with the listed authors and keywords): {CONFIGURATION['Preferences']['NegativeMatching']}")
         i8 = input("\nEnter the number of the setting you wish to update, or press enter to continue: ")
-        if i8 == "1":
-            tprint("Would you like to match resubmissions?")
-            i9 = input("\nEnter 'y' to enable resubmission matching or 'n' to disable it: ")
-            if i9 == "y" or i9 == "Y":
-                CONFIGURATION['Preferences']['MatchResubmissions'] = True
-                tprint("Resubmission matching enabled.")
-            elif i9 == "n" or i9 == "N":
-                CONFIGURATION['Preferences']['MatchResubmissions'] = False
-                tprint("Resubmission matching disabled.")
-            else:
-                tprint("\nInvalid choice. Please enter 'y' or 'n'.")
-        elif i8 == "":
-            return
-        else:
-            tprint("\nInvalid choice. Please enter a number corresponding to one of the settings.")
+
+        if i8.strip() == "1": CONFIGURATION['Preferences']['MatchResubmissions'] = not CONFIGURATION['Preferences']['MatchResubmissions']
+        elif i8.strip() == "2": CONFIGURATION['Preferences']['MatchAll'] = not CONFIGURATION['Preferences']['MatchAll']
+        elif i8.strip() == "3": CONFIGURATION['Preferences']['NegativeMatching'] = not CONFIGURATION['Preferences']['NegativeMatching']
+        elif i8.strip() == "": return
+        else: tprint("\nInvalid choice. Please enter a number corresponding to one of the settings.")
 
 
 def save_and_exit():

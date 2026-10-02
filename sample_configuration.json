@@ -8,7 +8,9 @@
 
   "Preferences": {
     "MatchResubmissions": false,
-    "UseZotero": true
+    "UseZotero": true,
+    "MatchAll": false,
+    "NegativeMatching": false
   },
 
   "Zotero": {
@@ -16,6 +18,7 @@
     "LibraryType": "user",
     "APIToken": "See1eeEE23EE4EEcret5s",
     "followXivCID": "ABCDEFGH",
-    "ZoteroPrefix": "fX"
+    "ZoteroPrefix": "fX",
+    "UseSubcollections": true
   }
 }
