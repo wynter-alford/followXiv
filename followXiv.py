@@ -80,7 +80,7 @@ class Entry:
         for term in term_list:
             if term.lower() in self.title.lower() or term.lower() in self.abstract.lower():
                 self.matches.append(term)
-        return len(self.matches) > 0
+        return ((len(self.matches) > 0) != preferences["NegativeMatching"]) or preferences["MatchAll"]
 
     def zoterify(self, template, col, zprefix):
         # add zotero item
@@ -138,25 +138,28 @@ config_file.close()
 if use_zotero:
     zinfo = config['Zotero']
     zlib = zotero.Zotero(zinfo['LibraryID'], zinfo['LibraryType'], zinfo['APIToken'])
-    collection = {"name": datetime.now().strftime("%Y-%m-%d"), "parentCollection": zinfo['followXivCID']}
     zprefix = zinfo.get('ZoteroPrefix', 'fX') 
-    try:
-        zcol = zlib.create_collections([collection])
-    except UserNotAuthorisedError as auth_err:
-        print(f"Authorization failed! {str(auth_err)}")
-        print("Exiting")
-        exit()
-    except PyZoteroError as e:
-        print(f"Zotero error: {e}")
-        print("Exiting")
-        exit()
-    except Exception as e:
-        print(f"Error: {e}")
-        print(
-            "Please make sure you have correctly specified your library ID, API token, and the collection ID in which followXiv should store its results.")
-        print("Exiting")
-        exit()
-    zkey = zcol['successful']['0']['key']  # key for today's collection, to add stuff to
+    if zinfo.get("UseSubcollections",True):
+        collection = {"name": datetime.now().strftime("%Y-%m-%d"), "parentCollection": zinfo['followXivCID']}
+        try:
+            zcol = zlib.create_collections([collection])
+        except UserNotAuthorisedError as auth_err:
+            print(f"Authorization failed! {str(auth_err)}")
+            print("Exiting")
+            exit()
+        except PyZoteroError as e:
+            print(f"Zotero error: {e}")
+            print("Exiting")
+            exit()
+        except Exception as e:
+            print(f"Error: {e}")
+            print(
+                "Please make sure you have correctly specified your library ID, API token, and the collection ID in which followXiv should store its results.")
+            print("Exiting")
+            exit()
+        zkey = zcol['successful']['0']['key']  # key for today's collection, to add stuff to
+    else:
+        zkey = zinfo['followXivCID']
 
 # Process feeds
 for feed_name in my_feeds:
@@ -176,8 +179,12 @@ for feed_name in my_feeds:
     else:
         num_resubmissions = 0
 
-    article_tops = soup.find_all('dt')[:-num_resubmissions]
-    articles = soup.find_all('dd')[:-num_resubmissions]
+    if num_resubmissions > 0:
+        article_tops = soup.find_all('dt')[:-num_resubmissions]
+        articles = soup.find_all('dd')[:-num_resubmissions]
+    else:
+        article_tops = soup.find_all('dt')
+        articles = soup.find_all('dd')
 
     for (article, article_top) in zip(articles, article_tops):
         entries_list.append(
