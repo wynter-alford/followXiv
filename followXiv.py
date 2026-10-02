@@ -176,8 +176,12 @@ for feed_name in my_feeds:
     else:
         num_resubmissions = 0
 
-    article_tops = soup.find_all('dt')[:-num_resubmissions]
-    articles = soup.find_all('dd')[:-num_resubmissions]
+    if num_resubmissions > 0:
+        article_tops = soup.find_all('dt')[:-num_resubmissions]
+        articles = soup.find_all('dd')[:-num_resubmissions]
+    else:
+        article_tops = soup.find_all('dt')
+        articles = soup.find_all('dd')
 
     for (article, article_top) in zip(articles, article_tops):
         entries_list.append(
