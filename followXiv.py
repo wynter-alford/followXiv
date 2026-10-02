@@ -80,7 +80,7 @@ class Entry:
         for term in term_list:
             if term.lower() in self.title.lower() or term.lower() in self.abstract.lower():
                 self.matches.append(term)
-        return ((len(self.matches) > 0) != preferences["NegativeMatching"]) or preferences["MatchAll"]
+        return ((len(self.matches) > 0) != preferences.get("NegativeMatching",False)) or preferences.get("MatchAll",False)
 
     def zoterify(self, template, col, zprefix):
         # add zotero item
