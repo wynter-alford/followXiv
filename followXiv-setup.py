@@ -11,7 +11,7 @@ try:
     CONFIGURATION = json.load(config_file)
     config_file.close()
 except OSError:
-    config_file = open("sample_CONFIGURATION.json", "r")
+    config_file = open("sample_configuration.json", "r")
     CONFIGURATION = json.load(config_file)
     config_file.close()
     NEW_SETUP = True
