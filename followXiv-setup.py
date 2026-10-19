@@ -473,8 +473,8 @@ def config_crontab(): # TODO: test this
             
             # attempt setup
             try: 
-                followxiv_path = os.system("pwd")
                 os.system(f'(crontab -l ; echo "0 {run_time} * * 1-5 cd {followxiv_path} && git reset --hard HEAD && git pull && {venv_path} followXiv.py && mv output.txt "$(date -I).txt" >/dev/null")| crontab -')
+                tprint("Crontab setup appears successful; to verify, run `crontab -l` once you have finished using the setup tool.")
             except OSError as err:
                 tprint(f"An error occurred: {err}. Please try again, or set up cron manually.")
             return
