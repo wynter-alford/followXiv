@@ -138,7 +138,7 @@ config_file.close()
 if use_zotero:
     zinfo = config['Zotero']
     zlib = zotero.Zotero(zinfo['LibraryID'], zinfo['LibraryType'], zinfo['APIToken'])
-    zprefix = zinfo.get('ZoteroPrefix', 'fX') 
+    zprefix = zinfo.get('ZoteroPrefix', 'fX')
     if zinfo.get("UseSubcollections",True):
         collection = {"name": datetime.now().strftime("%Y-%m-%d"), "parentCollection": zinfo['followXivCID']}
         try:
@@ -209,3 +209,15 @@ if use_zotero:
             zlib.create_items(items[i:i + size])
     else:
         zlib.create_items(items)
+
+    # delete items that are too old
+    duration = zinfo.get('StorageDuration', 0)
+    if duration != 0:
+        today = datetime.today().date()
+        if zinfo.get("UseSubcollections", True):
+            print("TODO - remove old subcollections")
+        else:
+            items = zlib.collection_items_top(zkey)
+            # is delete correct? it would cause issues if this same paper is supposed to be elsewhere, but if
+            # the paper was added to zotero by zotero connecter to get the pdf that will be unique
+            [zlib.delete_item(item) for item in items if (today - datetime.fromisoformat(item['data']['date']).date()).days > duration]
