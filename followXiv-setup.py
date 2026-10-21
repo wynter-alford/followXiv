@@ -312,6 +312,7 @@ def config_zotero():
             else:
                 tprint("6. Enable subcollections (will create a new subcollection for matches each day)")
             tprint("7. Disable Zotero")
+            tprint("8. Change match storage duration")
             tprint("Or press enter to continue with setup.")
             i6 = input("\nEnter a choice: ")
             if i6 == "1":
@@ -348,6 +349,15 @@ def config_zotero():
             elif i6 == "7":
                 CONFIGURATION['Preferences']['UseZotero'] = False
                 tprint("Zotero is now disabled.")
+            elif i6 == "8":
+                enable = True
+                if CONFIGURATION['Zotero']['StorageDuration'] != 0:
+                    enable = input("Would you like to store matches indefinitely? 'y' or 'n': ").lower() != 'y'
+                if enable:
+                    try: CONFIGURATION['Zotero']['StorageDuration'] = int(input("How many days should matches be stored for? "))
+                    except: tprint("\nThat's not a number!")
+                else:
+                    CONFIGURATION['Zotero']['StorageDuration'] = 0
             elif i6 == "":
                 return
 
@@ -394,8 +404,15 @@ def config_zotero_new():
                 CONFIGURATION["Zotero"]["UseSubcollections"] = True
                 break
             elif i13.strip() == "2": 
-                CONFIGURATION["Zotero"]["UseSubcollections"] = True
+                CONFIGURATION["Zotero"]["UseSubcollections"] = False
                 break
+        remove = input("Would you like old followXiv matches to be removed from the collection? Enter 'y' or 'n')")
+        days_int = 0
+        if remove.lower() == "y":
+            days = input("How many days should matches be stored for?")
+            try: days_int = int(days)
+            except: tprint("\nThat's not a number!")
+        CONFIGURATION["Zotero"]["StorageDuration"] = days_int
         tprint("\nZotero setup complete!")
         return
     else:
