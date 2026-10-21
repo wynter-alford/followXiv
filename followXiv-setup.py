@@ -18,7 +18,7 @@ try:
         CONFIGURATION["Preferences"]["NegativeMatching"] = False
     if not "UseSubcollections" in CONFIGURATION["Zotero"]:
         CONFIGURATION["Zotero"]["UseSubcollections"] = True
-        
+
 except OSError:
     config_file = open("sample_configuration.json", "r")
     CONFIGURATION = json.load(config_file)
@@ -153,7 +153,7 @@ def config_feed_list():
             i6 = input("\nEnter the number of the feed to remove: ")
             try:
                 i6 = int(i6)
-                if i6 > 0 and i6 <= len(feeds):
+                if 0 < i6 <= len(feeds):
                     feeds.pop(i6-1)
                     CONFIGURATION["Filters"]["Feeds"] = feeds
                     print("\nFeed removed.")
@@ -472,7 +472,7 @@ def config_crontab(): # TODO: test this
             tprint("Setting up crontab. On a Mac you may be shown a pop-up window; if so, click 'allow'.")
             
             # attempt setup
-            try: 
+            try:
                 os.system(f'(crontab -l ; echo "0 {run_time} * * 1-5 cd {followxiv_path} && git reset --hard HEAD && git pull && {venv_path} followXiv.py && mv output.txt "$(date -I).txt" >/dev/null")| crontab -')
                 tprint("Crontab setup appears successful; to verify, run `crontab -l` once you have finished using the setup tool.")
             except OSError as err:
