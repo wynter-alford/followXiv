@@ -10,6 +10,15 @@ try:
     NEW_SETUP = False
     CONFIGURATION = json.load(config_file)
     config_file.close()
+
+    # Update configuration file with newly added feeds (new preference options, for example)
+    if not "MatchAll" in CONFIGURATION["Preferences"]:
+        CONFIGURATION["Preferences"]["MatchAll"] = False
+    if not "NegativeMatching" in CONFIGURATION["Preferences"]:
+        CONFIGURATION["Preferences"]["NegativeMatching"] = False
+    if not "UseSubcollections" in CONFIGURATION["Zotero"]:
+        CONFIGURATION["Zotero"]["UseSubcollections"] = True
+        
 except OSError:
     config_file = open("sample_configuration.json", "r")
     CONFIGURATION = json.load(config_file)
@@ -23,15 +32,6 @@ def print_space():
     tprint("\n")
     tprint("-"*TERMINAL_WIDTH)
     tprint("\n")
-
-
-# Update configuration file with newly added feeds (new preference options, for example)
-if not "MatchAll" in CONFIGURATION["Preferences"]:
-    CONFIGURATION["Preferences"]["MatchAll"] = False
-if not "NegativeMatching" in CONFIGURATION["Preferences"]:
-    CONFIGURATION["Preferences"]["NegativeMatching"] = False
-if not "UseSubcollections" in CONFIGURATION["Zotero"]:
-    CONFIGURATION["Zotero"]["UseSubcollections"] = True
 
 
 # Header and license information
@@ -415,15 +415,17 @@ def config_crontab(): # TODO: test this
         elif i5 == 'y' or i5 == 'Y':
             import os
             if os.name == 'posix':
-                try: check_cron = os.system("crontab -l")
+                try: check_cron = os.system("which crontab")
                 except: 
-                    tprint("Sorry, your system appears to be incompatible with cron setup :(")
+                    tprint("Sorry, your system appears to be incompatible with cron setup")
+                    tprint("(running `which crontab` caused an exception)")
                     return
                 if check_cron > 0: 
                     tprint("Sorry, your system appears to be incompatible with cron setup :(")
+                    tprint("(running `which crontab` returned an os error; to diagnose, run `which crontab` in the terminal)")
                     return
             else:
-                tprint("Sorry, your system appears to be incompatible with cron setup :(")
+                tprint(f"Sorry, your system appears to be incompatible with cron setup (system type returned as {os.name}).")
                 return
 
             # get path to virtual env
@@ -471,8 +473,8 @@ def config_crontab(): # TODO: test this
             
             # attempt setup
             try: 
-                followxiv_path = os.system("pwd")
                 os.system(f'(crontab -l ; echo "0 {run_time} * * 1-5 cd {followxiv_path} && git reset --hard HEAD && git pull && {venv_path} followXiv.py && mv output.txt "$(date -I).txt" >/dev/null")| crontab -')
+                tprint("Crontab setup appears successful; to verify, run `crontab -l` once you have finished using the setup tool.")
             except OSError as err:
                 tprint(f"An error occurred: {err}. Please try again, or set up cron manually.")
             return
