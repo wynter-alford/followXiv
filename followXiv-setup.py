@@ -394,7 +394,7 @@ def config_zotero_new():
                 CONFIGURATION["Zotero"]["UseSubcollections"] = True
                 break
             elif i13.strip() == "2": 
-                CONFIGURATION["Zotero"]["UseSubcollections"] = True
+                CONFIGURATION["Zotero"]["UseSubcollections"] = False
                 break
         tprint("\nZotero setup complete!")
         return
