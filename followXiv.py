@@ -214,10 +214,26 @@ if use_zotero:
     duration = zinfo.get('StorageDuration', 0)
     if duration != 0:
         today = datetime.today().date()
+        items = []
+
         if zinfo.get("UseSubcollections", True):
             print("TODO - remove old subcollections")
         else:
-            items = zlib.collection_items_top(zkey)
-            # is delete correct? it would cause issues if this same paper is supposed to be elsewhere, but if
-            # the paper was added to zotero by zotero connecter to get the pdf that will be unique
-            [zlib.delete_item(item) for item in items if (today - datetime.fromisoformat(item['data']['date']).date()).days > duration]
+            limit = 100
+            start = 0
+            new_items = []
+
+            while start == 0 or len(new_items) != 0:
+                new_items = zlib.collection_items_top(zkey, start=start, limit=limit)
+                start += limit
+                items.extend(new_items)
+
+        print(len(items), " total followXiv items")
+        to_delete = [i for i in items if (today - datetime.fromisoformat(i['meta']['parsedDate']).date()).days > duration]
+        print(len(to_delete), " to delete")
+
+        # is delete correct? it would cause issues if this same paper is supposed to be elsewhere, but if
+        # the paper was added to zotero by zotero connecter to get the pdf that will be unique
+        # other option would be deletefrom_collection
+        for item in to_delete:
+            zlib.delete_item(item)
