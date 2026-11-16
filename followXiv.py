@@ -26,7 +26,8 @@ try:
     from pyzotero.zotero_errors import *
 except ModuleNotFoundError as err:
     print(err)
-    print("\nAn error occurred because a required package is missing. FollowXiv requires the following packages: requests, bs4, pyzotero. Please ensure they are all installed, then try again.")
+    print(
+        "\nAn error occurred because a required package is missing. FollowXiv requires the following packages: requests, bs4, pyzotero. Please ensure they are all installed, then try again.")
     print("\nExiting")
     exit()
 
@@ -80,7 +81,8 @@ class Entry:
         for term in term_list:
             if term.lower() in self.title.lower() or term.lower() in self.abstract.lower():
                 self.matches.append(term)
-        return ((len(self.matches) > 0) != preferences.get("NegativeMatching",False)) or preferences.get("MatchAll",False)
+        return ((len(self.matches) > 0) != preferences.get("NegativeMatching", False)) or preferences.get("MatchAll",
+                                                                                                          False)
 
     def zoterify(self, template, col, zprefix):
         # add zotero item
@@ -118,7 +120,6 @@ except OSError:
     # shutil.copy("sample_configuration.json", "configuration.json")
     # print("Please set up configuration file `configuration.json`. It was prepopulated with some generic defaults :)")
     # print("Exiting")
-    
 
 config = json.load(config_file)
 
@@ -139,7 +140,7 @@ if use_zotero:
     zinfo = config['Zotero']
     zlib = zotero.Zotero(zinfo['LibraryID'], zinfo['LibraryType'], zinfo['APIToken'])
     zprefix = zinfo.get('ZoteroPrefix', 'fX')
-    if zinfo.get("UseSubcollections",True):
+    if zinfo.get("UseSubcollections", True):
         collection = {"name": datetime.now().strftime("%Y-%m-%d"), "parentCollection": zinfo['followXivCID']}
         try:
             zcol = zlib.create_collections([collection])
@@ -214,11 +215,30 @@ if use_zotero:
     duration = zinfo.get('StorageDuration', 0)
     if duration != 0:
         today = datetime.today().date()
-        items = []
 
         if zinfo.get("UseSubcollections", True):
-            print("TODO - remove old subcollections")
+            print("WARNING - item deletion in Subcollection mode is untested")
+
+            subcollections = zlib.collections_sub(zinfo['followXivCID'])
+            print(len(subcollections), " total followXiv collections")
+
+            to_delete = []
+            for subcollection in subcollections:
+                if not subcollection['data'].get('deleted', False): continue
+                # python have good error handling challenge! difficulty impossible
+                try:
+                    datetime = datetime.fromisoformat(subcollection['data']['name'])
+                except ValueError:
+                    continue
+                if (today - datetime.date()).days > duration:
+                    to_delete.append(subcollection)
+
+            print(len(to_delete), " to delete")
+            for subcollection in to_delete:
+                zlib.delete_collection(subcollection)
+
         else:
+            items = []
             limit = 100
             start = 0
             new_items = []
@@ -228,12 +248,13 @@ if use_zotero:
                 start += limit
                 items.extend(new_items)
 
-        print(len(items), " total followXiv items")
-        to_delete = [i for i in items if (today - datetime.fromisoformat(i['meta']['parsedDate']).date()).days > duration]
-        print(len(to_delete), " to delete")
+            print(len(items), " total followXiv items")
+            to_delete = [i for i in items if
+                         (today - datetime.fromisoformat(i['meta']['parsedDate']).date()).days > duration]
+            print(len(to_delete), " to delete")
 
-        # is delete correct? it would cause issues if this same paper is supposed to be elsewhere, but if
-        # the paper was added to zotero by zotero connecter to get the pdf that will be unique
-        # other option would be deletefrom_collection
-        for item in to_delete:
-            zlib.delete_item(item)
+            # is delete correct? it would cause issues if this same paper is supposed to be elsewhere, but if
+            # the paper was added to zotero by zotero connecter to get the pdf that will be unique
+            # other option would be deletefrom_collection
+            for item in to_delete:
+                zlib.delete_item(item)
