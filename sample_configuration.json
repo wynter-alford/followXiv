@@ -19,6 +19,7 @@
     "APIToken": "See1eeEE23EE4EEcret5s",
     "followXivCID": "ABCDEFGH",
     "ZoteroPrefix": "fX",
-    "UseSubcollections": true
+    "UseSubcollections": true,
+    "StorageDuration": 0
   }
 }

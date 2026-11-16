@@ -18,7 +18,7 @@ try:
         CONFIGURATION["Preferences"]["NegativeMatching"] = False
     if not "UseSubcollections" in CONFIGURATION["Zotero"]:
         CONFIGURATION["Zotero"]["UseSubcollections"] = True
-        
+
 except OSError:
     config_file = open("sample_configuration.json", "r")
     CONFIGURATION = json.load(config_file)
@@ -153,7 +153,7 @@ def config_feed_list():
             i6 = input("\nEnter the number of the feed to remove: ")
             try:
                 i6 = int(i6)
-                if i6 > 0 and i6 <= len(feeds):
+                if 0 < i6 <= len(feeds):
                     feeds.pop(i6-1)
                     CONFIGURATION["Filters"]["Feeds"] = feeds
                     print("\nFeed removed.")
@@ -312,6 +312,7 @@ def config_zotero():
             else:
                 tprint("6. Enable subcollections (will create a new subcollection for matches each day)")
             tprint("7. Disable Zotero")
+            tprint("8. Change match storage duration")
             tprint("Or press enter to continue with setup.")
             i6 = input("\nEnter a choice: ")
             if i6 == "1":
@@ -348,6 +349,15 @@ def config_zotero():
             elif i6 == "7":
                 CONFIGURATION['Preferences']['UseZotero'] = False
                 tprint("Zotero is now disabled.")
+            elif i6 == "8":
+                enable = True
+                if CONFIGURATION['Zotero']['StorageDuration'] != 0:
+                    enable = input("Would you like to store matches indefinitely? 'y' or 'n': ").lower() != 'y'
+                if enable:
+                    try: CONFIGURATION['Zotero']['StorageDuration'] = int(input("How many days should matches be stored for? "))
+                    except: tprint("\nThat's not a number!")
+                else:
+                    CONFIGURATION['Zotero']['StorageDuration'] = 0
             elif i6 == "":
                 return
 
@@ -396,6 +406,13 @@ def config_zotero_new():
             elif i13.strip() == "2": 
                 CONFIGURATION["Zotero"]["UseSubcollections"] = False
                 break
+        remove = input("Would you like old followXiv matches to be removed from the collection? Enter 'y' or 'n')")
+        days_int = 0
+        if remove.lower() == "y":
+            days = input("How many days should matches be stored for?")
+            try: days_int = int(days)
+            except: tprint("\nThat's not a number!")
+        CONFIGURATION["Zotero"]["StorageDuration"] = days_int
         tprint("\nZotero setup complete!")
         return
     else:
@@ -472,7 +489,7 @@ def config_crontab(): # TODO: test this
             tprint("Setting up crontab. On a Mac you may be shown a pop-up window; if so, click 'allow'.")
             
             # attempt setup
-            try: 
+            try:
                 os.system(f'(crontab -l ; echo "0 {run_time} * * 1-5 cd {followxiv_path} && git reset --hard HEAD && git pull && {venv_path} followXiv.py && mv output.txt "$(date -I).txt" >/dev/null")| crontab -')
                 tprint("Crontab setup appears successful; to verify, run `crontab -l` once you have finished using the setup tool.")
             except OSError as err:
